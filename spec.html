@@ -622,6 +622,7 @@ remediation: "gmail account reauth work"</pre>
 
   <h3>Parsing strategy</h3>
   <p>For a single message, fetch <code>format=raw</code> and hand the RFC 5322 bytes to <strong>MimeKit</strong> rather than walking Gmail's nested <code>payload.parts</code> tree by hand. MimeKit already handles RFC 2047 encoded-words, quoted-printable, <code>multipart/alternative</code> nested inside <code>multipart/mixed</code>, inline <code>Content-ID</code> images and charset detection — all of which are easy to get subtly wrong and tedious to fix later. For search results, <code>format=metadata</code> with an explicit header list is far cheaper and skips the body entirely.</p>
+  <p><code>format=raw</code> is available on <code>users.messages.get</code> only. <code>users.threads.get</code> accepts <code>full</code>, <code>metadata</code> and <code>minimal</code>, and rejects <code>raw</code> with a <code>400</code> <code>invalid_input</code>. <code>thread get</code> therefore lists the thread at <code>format=minimal</code> to get the message ids in order, then fetches each selected message through <code>messages/{id}?format=raw</code> — the same call <code>message get</code> makes, so both render from an identical envelope.</p>
 
   <h3><code>--body</code> modes</h3>
   <div class="tw">
@@ -726,13 +727,14 @@ status: draft_created_not_sent</pre>
     <tbody>
       <tr><td class="c">users.messages.list</td><td class="n">5</td><td><code>search</code> — one call per page</td></tr>
       <tr><td class="c">users.messages.get</td><td class="n">5</td><td><code>search</code> hydration, <code>message get</code></td></tr>
-      <tr><td class="c">users.threads.get</td><td class="n">10</td><td><code>thread get</code></td></tr>
+      <tr><td class="c">users.threads.get</td><td class="n">10</td><td><code>thread get</code> — plus one <code>messages.get</code> per message returned</td></tr>
       <tr><td class="c">users.messages.attachments.get</td><td class="n">5</td><td><code>attachment download</code></td></tr>
       <tr><td class="c">users.drafts.create</td><td class="n">10</td><td><code>draft create</code>, <code>draft reply</code></td></tr>
       <tr><td class="c">users.labels.list</td><td class="n">1</td><td><code>label list</code></td></tr>
     </tbody>
   </table>
   </div>
+  <p><code>thread get</code> costs 10 for the thread listing plus 5 per message body, so a 20-message thread is ~110 units; <code>--max-messages</code> is applied before the bodies are fetched, which is what keeps that bounded. Those fetches run sequentially — the thread is one conversation, and parallelising a handful of calls buys nothing but a shot at the rate limiter.</p>
   <p>A <code>search --limit 50</code> therefore costs roughly 255 units — right at the per-second ceiling if issued flat out. Hydration runs at a default concurrency of <strong>5</strong> (<code>--concurrency</code> to override), which keeps a large search comfortably inside budget while staying an order of magnitude faster than fetching serially.</p>
   <p>On <code>429</code>, or <code>403</code> with reason <code>rateLimitExceeded</code> / <code>userRateLimitExceeded</code>: exponential backoff with full jitter, starting at 1 s, five attempts, honouring <code>Retry-After</code> when Google sends it. Exhausting the retries surfaces exit code <code>5</code>. A failure hydrating one message out of fifty degrades that entry to <code>error: fetch_failed</code> in the results rather than failing the whole search — partial output beats none.</p>
 </section>

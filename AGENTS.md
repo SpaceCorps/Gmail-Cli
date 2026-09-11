@@ -202,6 +202,13 @@ Gmail applies the mask server-side, so you get part filenames, sizes and attachm
 paying for the encoded body bytes. Raw responses carry no `attachmentId`, so attachment work
 must use the structure path.
 
+**`format=raw` exists on `messages.get` only.** `threads.get` takes `full`, `metadata` and
+`minimal`, and answers `raw` with a `400` / `invalid_input` naming the rejected enum value — the
+two endpoints do not share the format vocabulary even though the URLs look interchangeable.
+`thread get` lists the thread at `format=minimal` for the message ids, then fetches each selected
+message with `messages/{id}?format=raw`; `GetCommand.ThreadPath` / `MessagePath` hold those two
+URLs so a test can assert on them without a network.
+
 ## Gmail API notes
 
 Base URL `https://gmail.googleapis.com/gmail/v1/users/me/`. Quota is metered in units against a
@@ -211,6 +218,7 @@ per-user budget of **250 units/second** (moving average):
 | --- | --- |
 | `messages.list`, `messages.get`, `attachments.get` | 5 |
 | `threads.get`, `drafts.create`, `drafts.update` | 10 |
+| `thread get` end to end | 10 + 5 per message returned |
 | `labels.list`, `getProfile` | 1 |
 | `drafts.send`, `messages.send` | 100 |
 
