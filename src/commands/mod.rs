@@ -20,7 +20,9 @@ pub fn execute(cli: Cli) -> Result<()> {
 
     match cli.command {
         Command::Setup(args) => setup::run(args)?,
+        Command::Login(args) => account::run(crate::cli::AccountCommand::Add(args))?,
         Command::Account { command } => account::run(command)?,
+
         Command::Search(args) => {
             let val = search::run(args, verbose, timeout)?;
             output::write(&val);

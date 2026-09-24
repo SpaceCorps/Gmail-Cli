@@ -764,3 +764,17 @@ fn test_error_exit_codes() {
     assert_eq!(code, 6);
     assert_eq!(err["code"], "invalid_input");
 }
+
+#[test]
+fn test_login_subcommand() {
+    let mock = Mock::start(vec![]);
+    let env = Env::new(&mock);
+
+    // Verify `gmail login --help` succeeds
+    let output = env.run(&["login", "--help"]);
+    assert_eq!(output.status.code(), Some(0));
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("Log in to a Google account and store its credentials"));
+}
+

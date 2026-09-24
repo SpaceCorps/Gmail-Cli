@@ -34,7 +34,11 @@ pub enum Command {
     #[command(about = "Set up Google Cloud OAuth credentials, with a walkthrough")]
     Setup(SetupArgs),
 
+    #[command(about = "Log in to a Google account and store its credentials")]
+    Login(AccountAddArgs),
+
     #[command(about = "Manage named Gmail accounts", alias = "accounts")]
+
     Account {
         #[command(subcommand)]
         command: AccountCommand,
