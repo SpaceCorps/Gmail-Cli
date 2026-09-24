@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy · Gmail CLI</title>
+  <meta name="description" content="Privacy policy for Gmail CLI: Zero telemetry, local keystore credential storage, and developer data ownership principles.">
+  <link rel="canonical" href="https://spacecorps.github.io/Gmail-Cli/privacy.html">
+  <meta property="og:title" content="Privacy Policy · Gmail CLI">
+  <meta property="og:description" content="Privacy policy for Gmail CLI: Zero telemetry, local keystore credential storage, and developer data ownership principles.">
+  <meta property="og:url" content="https://spacecorps.github.io/Gmail-Cli/privacy.html">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://spacecorps.github.io/Gmail-Cli/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="is-agentic-site-type" content="content">
+  <style>
+    body { background: #090d16; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.7; padding: 40px 20px; }
+    .content-box { max-width: 800px; margin: 0 auto; background: rgba(22, 27, 46, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 40px; }
+    h1 { font-size: 2.2rem; margin-bottom: 20px; color: #fff; }
+    h2 { font-size: 1.4rem; margin-top: 30px; margin-bottom: 12px; color: #38bdf8; }
+    p { margin-bottom: 16px; color: #94a3b8; }
+    a { color: #38bdf8; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .back { display: inline-block; margin-bottom: 24px; color: #6366f1; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="content-box">
+    <a href="./" class="back">&larr; Back to Gmail CLI</a>
+    <h1>Privacy Policy & Data Security</h1>
+    
+    <p>Last updated: September 24, 2026. This Privacy Policy details the data handling, storage practices, and network communications of the Gmail CLI executable and documentation website.</p>
+
+    <h2>1. Zero Telemetry & Local Execution</h2>
+    <p>The Gmail CLI binary contains zero tracking code, zero analytics SDKs, and zero telemetry beacons. Developer and agent terminal workflows remain 100% private. The application does not collect usage metrics, IP addresses, execution timestamps, email subjects, or error logs back to any SpaceCorps server. The only outbound network requests made by the tool are direct HTTPS calls to official Google OAuth and Gmail endpoints (<code>googleapis.com</code>) to fulfill user-initiated operations.</p>
+
+    <h2>2. Cryptographic Credential Protection</h2>
+    <p>OAuth 2.0 client secrets and refresh tokens are sensitive credentials. Gmail CLI strictly refuses to save secret tokens in plain-text configuration files by default. Instead, refresh tokens and client credentials are delegated directly to the secure credential vault provided by the host operating system: macOS Keychain Services via the native security subsystem, Windows Data Protection API (DPAPI) encrypted under user-specific credentials, or the freedesktop.org Secret Service daemon via libsecret on Linux. Plaintext file fallback is only allowed with explicit opt-in (<code>GMAIL_ALLOW_PLAINTEXT_STORE=1</code>) and uses owner-only 0600 file permissions.</p>
+
+    <h2>3. Email Data Minimization & Safety</h2>
+    <p>Gmail CLI never transmits your emails or mailbox metadata to any third party. All mailbox parsing, MIME building, body rendering, and search hydration occur locally in memory within your active CLI process. Downloaded attachments and drafts remain strictly under your local file system and Google account.</p>
+
+    <h2>4. Website Privacy</h2>
+    <p>This documentation website is hosted as a static site on GitHub Pages. It contains no tracking scripts, no third-party cookies, and no personal data collection mechanisms. Standard web server access logs are handled directly by GitHub in accordance with GitHub's standard Privacy Statement.</p>
+  </div>
+</body>
+</html>

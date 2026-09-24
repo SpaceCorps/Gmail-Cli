@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About · Gmail CLI</title>
+  <meta name="description" content="About Gmail CLI: An open source native Rust command-line tool and agent interface for the Google Gmail API.">
+  <link rel="canonical" href="https://spacecorps.github.io/Gmail-Cli/about.html">
+  <meta property="og:title" content="About · Gmail CLI">
+  <meta property="og:description" content="About Gmail CLI: An open source native Rust command-line tool and agent interface for the Google Gmail API.">
+  <meta property="og:url" content="https://spacecorps.github.io/Gmail-Cli/about.html">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://spacecorps.github.io/Gmail-Cli/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="is-agentic-site-type" content="content">
+  <style>
+    body { background: #090d16; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.7; padding: 40px 20px; }
+    .content-box { max-width: 800px; margin: 0 auto; background: rgba(22, 27, 46, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 40px; }
+    h1 { font-size: 2.2rem; margin-bottom: 20px; color: #fff; }
+    h2 { font-size: 1.4rem; margin-top: 30px; margin-bottom: 12px; color: #38bdf8; }
+    p { margin-bottom: 16px; color: #94a3b8; }
+    a { color: #38bdf8; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .back { display: inline-block; margin-bottom: 24px; color: #6366f1; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="content-box">
+    <a href="./" class="back">&larr; Back to Gmail CLI</a>
+    <h1>About Gmail CLI</h1>
+    
+    <p>Gmail CLI is a high-performance, open-source command-line tool and programmatic automation interface designed specifically for the Google Gmail API (v1). Maintained under the SpaceCorps open-source engineering collective, the project originated to provide developers and autonomous AI agents with a single, standalone binary capable of operating seamlessly across macOS, Linux, and Windows without runtime dependencies or interpreter overhead.</p>
+
+    <h2>Project Mission & Origins</h2>
+    <p>Modern terminal workflows and AI-driven automation demand rapid feedback loops and absolute security. The original prototype CLI was implemented as a .NET console application by Niels Bosma (<code>nielsbosma/Gmail.Console</code>). While functional, autonomous coding assistants and shell pipelines benefit immensely from static binaries that start in 1 to 3 milliseconds without managed runtime startup latencies. In 2026, the CLI was completely re-architected in native Rust 2024 to achieve instant startup, predictable resource utilization, and zero external runtime dependencies.</p>
+
+    <h2>Architectural Principles & Safety Guarantees</h2>
+    <p>Gmail CLI is built around four uncompromising principles: safety, determinism, prompt-injection defense, and speed.</p>
+    <ul>
+      <li><strong>Draft Safety Guarantee:</strong> The CLI deliberately does not implement an email sending command. It can create, reply to, update, and delete drafts, but human confirmation via the Gmail web interface is strictly required before any email is dispatched.</li>
+      <li><strong>Prompt-Injection Mitigation:</strong> Untrusted external email content (subject lines, sender headers, message bodies, attachment names) is strictly demarcated with clear boundary markers (<code>--- untrusted email content begins ---</code> / <code>--- untrusted email content ends ---</code>) to protect LLM agents from adversarial prompt injections.</li>
+      <li><strong>OS Keystore Protection:</strong> Unlike conventional scripts that store plain-text OAuth refresh tokens on disk, Gmail CLI integrates natively with host operating system credential vaults—such as macOS Keychain, Windows DPAPI, and the Linux Secret Service daemon.</li>
+      <li><strong>Strict Account Scoping:</strong> To prevent catastrophic accidental operations across personal, work, and client inboxes, all mailbox commands require an explicit <code>--account</code> flag. There is no ambiguous default account.</li>
+    </ul>
+
+    <h2>Specification & Compatibility</h2>
+    <p>Every command and flag in the CLI is grounded directly in the official Google Gmail REST API v1 specification, providing full support for message search, thread hydration, attachment downloading with directory traversal defense, label management, draft composition, and comprehensive environment diagnostics.</p>
+  </div>
+</body>
+</html>

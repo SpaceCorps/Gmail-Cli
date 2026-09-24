@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "gmail-cli",
+      "description": "Search mailboxes, read messages and threads safely, pull attachments, and stage draft replies on Gmail via native Rust CLI.",
+      "type": "skill-md",
+      "url": "https://spacecorps.github.io/Gmail-Cli/llms.txt",
+      "digest": "sha256:688b1e82daa8c55436eefa5a587062b6b38a9775534744f6439384a33339f003"
+    }
+  ]
+}

@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gmail CLI | Fast Native CLI for Gmail in Rust</title>
+  <meta name="description" content="A blazing fast native command-line tool and agent interface for the Google Gmail API (v1), written in Rust 2024. Search messages, inspect threads, download attachments, and create drafts safely with OS keystore security and prompt-injection defense.">
+  <link rel="canonical" href="https://spacecorps.github.io/Gmail-Cli/">
+  <meta name="is-agentic-site-type" content="content">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="keywords" content="Gmail, CLI, Rust, Google Cloud, Gmail API, AI agents, LLM, prompt injection defense, email drafts, developer tools">
+  <meta name="author" content="SpaceCorps">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://spacecorps.github.io/Gmail-Cli/">
+  <meta property="og:title" content="Gmail CLI | Fast Native CLI for Gmail in Rust">
+  <meta property="og:description" content="A blazing fast native command-line tool and agent interface for the Google Gmail API (v1), written in Rust 2024.">
+  <meta property="og:image" content="https://spacecorps.github.io/Gmail-Cli/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Gmail CLI — Native Rust Command Line Tool">
+  <meta property="og:site_name" content="Gmail CLI">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://spacecorps.github.io/Gmail-Cli/">
+  <meta name="twitter:title" content="Gmail CLI | Fast Native CLI for Gmail in Rust">
+  <meta name="twitter:description" content="A blazing fast native command-line tool and agent interface for the Google Gmail API (v1), written in Rust 2024.">
+  <meta name="twitter:image" content="https://spacecorps.github.io/Gmail-Cli/og-image.png">
+
+  <!-- AI Agents & Discovery -->
+  <link rel="alternate" type="text/markdown" href="https://spacecorps.github.io/Gmail-Cli/index.md" title="Markdown Homepage">
+  <link rel="alternate" type="text/markdown" href="https://spacecorps.github.io/Gmail-Cli/llms.txt" title="LLMs.txt">
+  <link rel="sitemap" type="application/xml" href="https://spacecorps.github.io/Gmail-Cli/sitemap.xml" title="Sitemap">
+  <script>
+    if (new URLSearchParams(window.location.search).get('mode') === 'agent') {
+      window.location.href = 'llms.txt';
+    }
+  </script>
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📧</text></svg>">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Gmail CLI",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "macOS, Linux, Windows",
+        "url": "https://spacecorps.github.io/Gmail-Cli/",
+        "description": "A blazing fast native command-line tool and agent interface for the Google Gmail API (v1), written in Rust 2024.",
+        "softwareVersion": "1.0.0",
+        "downloadUrl": "https://github.com/SpaceCorps/Gmail-Cli/releases/tag/v1.0.0",
+        "license": "https://opensource.org/licenses/MIT",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "author": {
+          "@type": "Organization",
+          "name": "SpaceCorps",
+          "url": "https://github.com/SpaceCorps"
+        }
+      },
+      {
+        "@type": "Organization",
+        "name": "SpaceCorps",
+        "url": "https://github.com/SpaceCorps",
+        "sameAs": [
+          "https://github.com/SpaceCorps/Gmail-Cli",
+          "https://github.com/SpaceCorps"
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "technical support",
+          "url": "https://github.com/SpaceCorps/Gmail-Cli/issues"
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "US"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --bg: #090d16;
+      --bg-card: rgba(22, 27, 46, 0.7);
+      --bg-card-hover: rgba(30, 38, 66, 0.85);
+      --border: rgba(255, 255, 255, 0.1);
+      --border-accent: rgba(99, 102, 241, 0.35);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-glow: rgba(99, 102, 241, 0.25);
+      --accent: #38bdf8;
+      --success: #10b981;
+      --code-bg: #0d1117;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.18), transparent),
+        radial-gradient(circle 400px at 90% 20%, rgba(56, 189, 248, 0.08), transparent);
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+    a:hover {
+      color: #7dd3fc;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    header {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(9, 13, 22, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: #fff;
+    }
+    .logo-badge {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    .nav-links a:hover {
+      color: #fff;
+    }
+    .btn-github {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: #fff !important;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-github:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid var(--border-accent);
+      color: #c7d2fe;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: clamp(1.1rem, 2vw, 1.25rem);
+      color: var(--text-muted);
+      max-width: 720px;
+      margin: 0 auto 36px;
+    }
+
+    .install-box {
+      max-width: 640px;
+      margin: 0 auto 40px;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--border);
+    }
+
+    .install-cmd {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      color: #e2e8f0;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding-right: 12px;
+    }
+    .install-cmd span.prefix {
+      color: var(--accent);
+      user-select: none;
+      margin-right: 8px;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+    }
+    .copy-btn.copied {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 70px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: all 0.25s ease;
+    }
+    .feature-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+    }
+    .feature-icon {
+      font-size: 1.75rem;
+      margin-bottom: 12px;
+    }
+    .feature-card h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    .feature-card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+
+    .section-title {
+      font-size: 1.85rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #fff;
+      text-align: center;
+    }
+    .section-sub {
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .steps-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 80px;
+    }
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+    .step-num {
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+    }
+    .step-card h3 {
+      font-size: 1.15rem;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    .step-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .step-code {
+      margin-top: auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #38bdf8;
+      overflow-x: auto;
+    }
+
+    .terminal-window {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      margin-bottom: 80px;
+      overflow: hidden;
+    }
+    .terminal-header {
+      background: #161b22;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+    .terminal-title {
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .terminal-body {
+      padding: 24px;
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      line-height: 1.7;
+      overflow-x: auto;
+      color: #e2e8f0;
+    }
+    .terminal-body .cmd {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+    .terminal-body .comment {
+      color: #64748b;
+    }
+    .terminal-body .success {
+      color: #4ade80;
+    }
+    .terminal-body .key {
+      color: #c084fc;
+    }
+    .terminal-body .untrusted {
+      color: #fbbf24;
+      font-style: italic;
+    }
+
+    .cmd-section {
+      margin-bottom: 80px;
+    }
+    .tab-nav {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 18px;
+      border-radius: 9999px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .tab-content {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      display: none;
+      overflow-x: auto;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    footer {
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      background: #060910;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      color: var(--text-muted);
+    }
+    .footer-links a:hover {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container nav">
+      <div class="logo">
+        <span>📧 gmail</span>
+        <span class="logo-badge">RUST CLI</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#quickstart">Quickstart</a></li>
+        <li><a href="#releases">Releases</a></li>
+        <li><a href="#commands">Commands</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+        <li><a href="auth.html">OAuth Guide</a></li>
+        <li><a href="llms.txt">llms.txt</a></li>
+        <li>
+          <a class="btn-github" href="https://github.com/SpaceCorps/Gmail-Cli" target="_blank" rel="noopener noreferrer">
+            <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+            GitHub
+          </a>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="pill">📧 <strong>v1.0.0 Stable</strong> &bull; Native Rust 2024 &bull; Gmail API v1 &bull; <a href="https://github.com/SpaceCorps/Gmail-Cli/releases/tag/v1.0.0" style="color:#38bdf8;text-decoration:underline;">Release Notes &rarr;</a></div>
+      <h1>A Lightning Fast CLI for Gmail</h1>
+      <p>Search messages, hydrate threads, download attachments, and prepare drafts safely from your terminal or AI workflows.</p>
+
+      <div class="install-box">
+        <div class="install-cmd">
+          <span class="prefix">$</span>cargo install --git https://github.com/SpaceCorps/Gmail-Cli --locked
+        </div>
+        <button class="copy-btn" onclick="copyInstallCmd(this)">Copy</button>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <h2 class="section-title">Core Advantages</h2>
+    <section class="features">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>1–3 ms Startup</h3>
+        <p>A single static Rust 2024 binary with zero runtime dependencies. Instant startup for shell pipelines and scripts.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>Draft Safety Guarantee</h3>
+        <p>The CLI can only create, update, and manage drafts. Sending emails is permanently disallowed without human webmail review.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔐</div>
+        <h3>OS Keystore Security</h3>
+        <p>OAuth tokens are securely stored in macOS Keychain, Windows DPAPI, or Linux Secret Service—never plain text files.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <h3>Prompt-Injection Defense</h3>
+        <p>Untrusted email content is strictly enclosed within standard boundary delimiters to protect LLM agents from injection.</p>
+      </div>
+    </section>
+
+    <!-- Terminal Demo -->
+    <section>
+      <div class="terminal-window">
+        <div class="terminal-header">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+          <span class="terminal-title">zsh - gmail</span>
+        </div>
+        <div class="terminal-body">
+          <p><span class="cmd">$ gmail search "is:unread newer_than:2d" --account work</span></p>
+          <p><span class="key">count:</span> 1</p>
+          <p><span class="key">results:</span></p>
+          <p>&nbsp;&nbsp;- <span class="key">id:</span> 18e4f1a2b3c4d5e6</p>
+          <p>&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">threadId:</span> 18e4f1a2b3c4d5e6</p>
+          <p>&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">from:</span> Alex Rivera &lt;alex@example.com&gt;</p>
+          <p>&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">subject:</span> Q3 Planning Review</p>
+          <p>&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">snippet:</span> Could you take a look at the attached roadmap proposal...</p>
+          <br>
+          <p><span class="cmd">$ gmail draft reply 18e4f1a2b3c4d5e6 --body "Looks great, approved." --account work</span></p>
+          <p><span class="key">draft_created_not_sent:</span></p>
+          <p>&nbsp;&nbsp;<span class="key">draftId:</span> r-7890123456</p>
+          <p>&nbsp;&nbsp;<span class="key">messageId:</span> 18e4f1a2b3c4d5e7</p>
+          <p>&nbsp;&nbsp;<span class="key">threadId:</span> 18e4f1a2b3c4d5e6</p>
+          <p>&nbsp;&nbsp;<span class="key">to:</span> [alex@example.com]</p>
+          <p>&nbsp;&nbsp;<span class="key">subject:</span> Re: Q3 Planning Review</p>
+          <p>&nbsp;&nbsp;<span class="key">webUrl:</span> <a href="https://mail.google.com/mail/u/0/#drafts?compose=r-7890123456" target="_blank" style="color:#38bdf8;">https://mail.google.com/mail/u/0/#drafts?compose=r-7890123456</a></p>
+          <p class="success">✓ Draft created successfully. Please open webUrl in browser to review and send.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- When to Use -->
+    <section style="margin-bottom: 70px;">
+      <h2 class="section-title">When To Use Gmail CLI</h2>
+      <p class="section-sub">Guidance for developers, autonomous AI agents, and automated pipelines.</p>
+      
+      <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; max-width: 900px; margin: 0 auto;">
+        <h3 style="color: #38bdf8; font-size: 1.15rem; margin-bottom: 12px;">Best-Fit Scenarios</h3>
+        <ul style="margin-left: 20px; margin-bottom: 24px; color: var(--text-muted); line-height: 1.8;">
+          <li><strong>Autonomous AI Agent Mailbox Triage:</strong> Safely summarize, filter, and extract action items from inboxes with structured JSON and prompt injection markers.</li>
+          <li><strong>Automated Draft Composition:</strong> Prepare context-aware replies and new email drafts without risking unintended email transmission.</li>
+          <li><strong>Secure Attachment Harvesting:</strong> Download invoices, receipts, and reports with automatic path sanitization and directory traversal defense.</li>
+          <li><strong>Multi-Account Inbox Auditing:</strong> Inspect labels, message counts, and unread threads across personal and enterprise accounts with strict <code>--account</code> separation.</li>
+        </ul>
+
+        <h3 style="color: #c084fc; font-size: 1.15rem; margin-bottom: 12px;">When Not to Use</h3>
+        <ul style="margin-left: 20px; color: var(--text-muted); line-height: 1.8;">
+          <li>When you want automated headless email sending (the CLI guarantees drafts only; human review via Gmail web is required).</li>
+          <li>When you need full interactive TUI email client browsing (use a terminal mail client like Neomutt or Aerc).</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Quickstart Workflow -->
+    <section id="quickstart">
+      <h2 class="section-title">Quickstart Workflow</h2>
+      <p class="section-sub">Get configured and productive in less than two minutes.</p>
+
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h3>Install</h3>
+          <p>Install the CLI using Cargo or download prebuilt binaries from GitHub Releases.</p>
+          <div class="step-code">cargo install --git https://github.com/SpaceCorps/Gmail-Cli</div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h3>Setup</h3>
+          <p>Run <code>gmail setup</code> to initiate the PKCE OAuth loopback flow and secure credentials in your OS vault.</p>
+          <div class="step-code">gmail setup --account work</div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h3>Search & Draft</h3>
+          <p>Search unread messages, inspect threads, and compose draft replies safely.</p>
+          <div class="step-code">gmail search "is:unread" --account work</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Release & Downloads -->
+    <section id="releases" class="releases-section">
+      <h2 class="section-title">v1.0.0 Stable Release</h2>
+      <p class="section-sub">Download pre-compiled standalone binaries for macOS, Linux, and Windows.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 30px 0;">
+        <a href="https://github.com/SpaceCorps/Gmail-Cli/releases/download/v1.0.0/gmail-v1.0.0-aarch64-apple-darwin.tar.gz" style="background: rgba(22, 27, 46, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; text-decoration: none; display: flex; flex-direction: column; gap: 8px; transition: all 0.2s;">
+          <div style="font-weight: 600; color: #fff; font-size: 1.05rem;">🍎 macOS (Apple Silicon)</div>
+          <div style="color: #94a3b8; font-size: 0.85rem;">aarch64-apple-darwin &bull; .tar.gz</div>
+          <div style="color: #38bdf8; font-size: 0.9rem; margin-top: auto;">Download &darr;</div>
+        </a>
+        <a href="https://github.com/SpaceCorps/Gmail-Cli/releases/download/v1.0.0/gmail-v1.0.0-x86_64-apple-darwin.tar.gz" style="background: rgba(22, 27, 46, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; text-decoration: none; display: flex; flex-direction: column; gap: 8px; transition: all 0.2s;">
+          <div style="font-weight: 600; color: #fff; font-size: 1.05rem;">🍏 macOS (Intel)</div>
+          <div style="color: #94a3b8; font-size: 0.85rem;">x86_64-apple-darwin &bull; .tar.gz</div>
+          <div style="color: #38bdf8; font-size: 0.9rem; margin-top: auto;">Download &darr;</div>
+        </a>
+        <a href="https://github.com/SpaceCorps/Gmail-Cli/releases/download/v1.0.0/gmail-v1.0.0-x86_64-unknown-linux-musl.tar.gz" style="background: rgba(22, 27, 46, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; text-decoration: none; display: flex; flex-direction: column; gap: 8px; transition: all 0.2s;">
+          <div style="font-weight: 600; color: #fff; font-size: 1.05rem;">🐧 Linux (x86_64)</div>
+          <div style="color: #94a3b8; font-size: 0.85rem;">musl static binary &bull; .tar.gz</div>
+          <div style="color: #38bdf8; font-size: 0.9rem; margin-top: auto;">Download &darr;</div>
+        </a>
+        <a href="https://github.com/SpaceCorps/Gmail-Cli/releases/download/v1.0.0/gmail-v1.0.0-x86_64-pc-windows-msvc.zip" style="background: rgba(22, 27, 46, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; text-decoration: none; display: flex; flex-direction: column; gap: 8px; transition: all 0.2s;">
+          <div style="font-weight: 600; color: #fff; font-size: 1.05rem;">🪟 Windows (x64)</div>
+          <div style="color: #94a3b8; font-size: 0.85rem;">x86_64-pc-windows-msvc &bull; .zip</div>
+          <div style="color: #38bdf8; font-size: 0.9rem; margin-top: auto;">Download &darr;</div>
+        </a>
+      </div>
+
+      <p style="text-align: center; color: #94a3b8; font-size: 0.95rem;">
+        View full changelog and SHA256 checksums on <a href="https://github.com/SpaceCorps/Gmail-Cli/releases/tag/v1.0.0" style="color: #38bdf8; text-decoration: underline;">GitHub Releases</a>.
+      </p>
+    </section>
+
+    <!-- Command Tabs -->
+    <section id="commands" class="cmd-section">
+      <h2 class="section-title">Command Reference</h2>
+      <p class="section-sub">Organized by resource category.</p>
+
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('auth')">Setup & Accounts</button>
+        <button class="tab-btn" onclick="switchTab('search')">Search & Hydration</button>
+        <button class="tab-btn" onclick="switchTab('messages')">Messages & Attachments</button>
+        <button class="tab-btn" onclick="switchTab('drafts')">Drafts & Labels</button>
+      </div>
+
+      <div id="tab-auth" class="tab-content active">
+<pre># Interactive PKCE OAuth setup (Desktop loopback)
+gmail setup --account work
+
+# Setup with explicit client credentials
+gmail setup --account work --client-id &lt;id&gt; --client-secret &lt;secret&gt;
+
+# Headless / manual setup for SSH servers
+gmail setup --account ci --manual
+
+# List configured accounts
+gmail account list
+
+# Remove an account and purge its secrets from keystore
+gmail account remove work --yes
+
+# System diagnostics (keystore, clock skew, API reachability)
+gmail doctor
+gmail doctor --account work</pre>
+      </div>
+
+      <div id="tab-search" class="tab-content">
+<pre># Search messages (hydrated with snippet, subject, from, date)
+gmail search "is:unread newer_than:7d" --account work
+
+# Limit search results (1-50, default 10)
+gmail search "from:boss@example.com" --limit 5 --account work
+
+# Fast query without hydrating message bodies
+gmail search "label:INBOX" --no-hydrate --account work
+
+# Raw JSON output for machine parsing
+gmail search "has:attachment" --account work --json | jq .</pre>
+      </div>
+
+      <div id="tab-messages" class="tab-content">
+<pre># Read message content with untrusted boundary protection
+gmail message get &lt;id&gt; --account work
+
+# Request HTML body representation
+gmail message get &lt;id&gt; --body-mode html --account work
+
+# Read raw RFC 822 / RFC 2822 / RFC 5322 MIME
+gmail message get &lt;id&gt; --body-mode raw --account work
+
+# Read an entire conversation thread
+gmail thread get &lt;thread-id&gt; --account work
+
+# Download an attachment safely to a local folder
+gmail attachment get &lt;message-id&gt; &lt;attachment-id&gt; --output ./downloads --account work</pre>
+      </div>
+
+      <div id="tab-drafts" class="tab-content">
+<pre># Create a new draft (Draft safety: created, NEVER sent!)
+gmail draft create --to "team@example.com" --subject "Status Update" --body "Draft text" --account work
+
+# Reply to a message (auto-calculates Re: subject and References)
+gmail draft reply &lt;message-id&gt; --body "Thank you for the update." --account work
+
+# Reply-All to all recipients
+gmail draft reply &lt;message-id&gt; --reply-all --body "Acknowledged by team." --account work
+
+# List and inspect existing drafts
+gmail draft list --account work
+gmail draft get &lt;draft-id&gt; --account work
+
+# Update an existing draft
+gmail draft update &lt;draft-id&gt; --body "Revised draft content" --account work
+
+# List all labels
+gmail label list --account work</pre>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="auth.html">OAuth Guide</a>
+        <a href="pricing.md">Pricing</a>
+        <a href="llms.txt">llms.txt</a>
+        <a href="sitemap.xml">Sitemap</a>
+        <a href="https://github.com/SpaceCorps/Gmail-Cli" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://developers.google.com/gmail/api" target="_blank" rel="noopener noreferrer">Gmail API</a>
+      </div>
+      <p>Gmail CLI &bull; Maintained under SpaceCorps &bull; Licensed under MIT</p>
+    </div>
+  </footer>
+
+  <script>
+    function copyInstallCmd(btn) {
+      const cmd = "cargo install --git https://github.com/SpaceCorps/Gmail-Cli --locked";
+      navigator.clipboard.writeText(cmd).then(() => {
+        btn.textContent = "Copied!";
+        btn.classList.add("copied");
+        setTimeout(() => {
+          btn.textContent = "Copy";
+          btn.classList.remove("copied");
+        }, 2000);
+      });
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      const activeContent = document.getElementById('tab-' + tabId);
+      if (activeContent) activeContent.classList.add('active');
+      
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>

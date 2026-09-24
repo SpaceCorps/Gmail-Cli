@@ -1,0 +1,17 @@
+{
+  "name": "Gmail CLI Agent",
+  "description": "Agent interface and secure mailbox management tool for the Google Gmail REST API.",
+  "url": "https://spacecorps.github.io/Gmail-Cli/",
+  "version": "1.0.0",
+  "capabilities": ["email-search", "email-read", "attachments", "drafts", "accounts"],
+  "skills": [
+    {
+      "name": "gmail-cli",
+      "url": "https://spacecorps.github.io/Gmail-Cli/llms.txt"
+    }
+  ],
+  "contact": {
+    "email": "contact@spacecorps.dev",
+    "url": "https://spacecorps.github.io/Gmail-Cli/contact.html"
+  }
+}
